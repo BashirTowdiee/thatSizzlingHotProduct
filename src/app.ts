@@ -1,7 +1,7 @@
-import Fastify from 'fastify';
-import cors from '@fastify/cors';
-import sensible from '@fastify/sensible';
-import { routes } from './routes/index.js';
+import Fastify from "fastify";
+import cors from "@fastify/cors";
+import sensible from "@fastify/sensible";
+import { routes } from "./routes/index.js";
 
 export async function createServer() {
   const app = Fastify({

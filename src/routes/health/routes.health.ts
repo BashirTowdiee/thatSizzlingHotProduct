@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance } from "fastify";
 
 export default async function healthRoutes(app: FastifyInstance) {
   app.get(
@@ -10,11 +10,11 @@ export default async function healthRoutes(app: FastifyInstance) {
             type: "object",
             required: ["status"],
             properties: {
-              status: { type: "string" }
-            }
-          }
-        }
-      }
+              status: { type: "string" },
+            },
+          },
+        },
+      },
     },
     async () => ({ status: "ok" })
   );
