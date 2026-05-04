@@ -43,6 +43,16 @@ inputs/
   orders.json
 ```
 
+## Architecture Notes
+
+- **Route layer (`src/routes`)** handles HTTP concerns: parsing/query validation, status codes, and response shapes.
+- **Domain layer (`src/domain`)** owns the product-calculation business rules.
+- **Data layer (`src/data`)** owns reading, validating, and exposing input data from JSON files.
+
+The domain logic is framework-independent and directly unit-testable, which keeps rule verification fast and focused.
+
+This separation is intentionally lightweight and helps keep business rules isolated from transport concerns without presenting this as a full enterprise clean-architecture implementation.
+
 ## Run Instructions
 
 ```bash
