@@ -236,6 +236,10 @@ Current suite includes:
 - CI workflow added at `.github/workflows/ci.yml` for push and pull requests.
 - CI pipeline runs: `npm ci`, `npm run format:check`, `npm run build`, and `npm test`.
 
+## Future Scaling Considerations
+
+The current implementation is intentionally in-memory because the challenge dataset is small and static. For larger datasets, ingestion should be separated from query serving, with products and orders normalised and persisted in a database. Query paths should use precomputed daily product/customer aggregates rather than scanning raw orders on each request. For production readiness, add stronger observability (metrics/tracing), consistent structured logging with request IDs, and maintained API contract documentation.
+
 ## Reviewer Notes
 
 - This implementation is intentionally incremental and test-backed.
