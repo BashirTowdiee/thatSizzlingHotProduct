@@ -120,6 +120,63 @@ describe("calculateProductSalesCounts", () => {
 
     expect(counts.get("P1")).toBe(2);
   });
+
+  it("removes the contribution of a completed order when a matching cancellation exists", () => {
+    const orders: Order[] = [
+      {
+        orderId: "O1",
+        customerId: "C1",
+        entries: [{ id: "P1", quantity: 4 }],
+        date: "21/04/2026",
+        status: "completed",
+      },
+      {
+        orderId: "O2",
+        customerId: "C2",
+        entries: [{ id: "P2", quantity: 1 }],
+        date: "21/04/2026",
+        status: "completed",
+      },
+      {
+        orderId: "O1",
+        date: "22/04/2026",
+        status: "cancelled",
+      },
+    ];
+
+    const counts = calculateProductSalesCounts(orders);
+
+    expect(counts.get("P1")).toBeUndefined();
+    expect(counts.get("P2")).toBe(1);
+  });
+
+  it("keeps one same-day duplicate sale when only one duplicate order is cancelled", () => {
+    const orders: Order[] = [
+      {
+        orderId: "O1",
+        customerId: "C1",
+        entries: [{ id: "P1", quantity: 1 }],
+        date: "21/04/2026",
+        status: "completed",
+      },
+      {
+        orderId: "O2",
+        customerId: "C1",
+        entries: [{ id: "P1", quantity: 3 }],
+        date: "21/04/2026",
+        status: "completed",
+      },
+      {
+        orderId: "O1",
+        date: "22/04/2026",
+        status: "cancelled",
+      },
+    ];
+
+    const counts = calculateProductSalesCounts(orders);
+
+    expect(counts.get("P1")).toBe(1);
+  });
 });
 
 describe("pickTopProductFromOrders", () => {

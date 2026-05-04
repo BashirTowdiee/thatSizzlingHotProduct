@@ -3,10 +3,14 @@ import type { Order, Product, ProductWinner } from "./types.js";
 export function calculateProductSalesCounts(orders: Order[]): Map<string, number> {
   const counts = new Map<string, number>();
   const countedSales = new Set<string>();
+  const cancelledOrderIds = new Set(
+    orders.filter((order) => order.status === "cancelled").map((order) => order.orderId),
+  );
 
   for (const order of orders) {
     if (
       order.status !== "completed" ||
+      cancelledOrderIds.has(order.orderId) ||
       typeof order.customerId !== "string" ||
       !Array.isArray(order.entries)
     ) {
