@@ -3,13 +3,15 @@ import type { Order, Product, ProductWinner } from "./types.js";
 export function calculateProductSalesCounts(
   orders: Order[],
   fromDate?: string,
-  toDate?: string,
+  toDate?: string
 ): Map<string, number> {
   const counts = new Map<string, number>();
   const countedSales = new Set<string>();
   const dateRange = resolveDateRange(fromDate, toDate);
   const cancelledOrderIds = new Set(
-    orders.filter((order) => order.status === "cancelled").map((order) => order.orderId),
+    orders
+      .filter((order) => order.status === "cancelled")
+      .map((order) => order.orderId)
   );
 
   for (const order of orders) {
@@ -22,7 +24,10 @@ export function calculateProductSalesCounts(
       continue;
     }
 
-    if (dateRange && !isDateInRange(order.date, dateRange.startKey, dateRange.endKey)) {
+    if (
+      dateRange &&
+      !isDateInRange(order.date, dateRange.startKey, dateRange.endKey)
+    ) {
       continue;
     }
 
@@ -47,13 +52,21 @@ export function pickTopProductFromOrders(
   products: Product[],
   orders: Order[],
   fromDate?: string,
-  toDate?: string,
+  toDate?: string
 ): ProductWinner {
-  return pickTopProduct(products, calculateProductSalesCounts(orders, fromDate, toDate));
+  return pickTopProduct(
+    products,
+    calculateProductSalesCounts(orders, fromDate, toDate)
+  );
 }
 
-export function pickTopProduct(products: Product[], counts: Map<string, number>): ProductWinner {
-  const productsById = new Map(products.map((product) => [product.id, product]));
+export function pickTopProduct(
+  products: Product[],
+  counts: Map<string, number>
+): ProductWinner {
+  const productsById = new Map(
+    products.map((product) => [product.id, product])
+  );
   const candidates = [...counts.entries()]
     .filter(([, salesCount]) => Number.isFinite(salesCount) && salesCount > 0)
     .map(([productId, salesCount]) => {
@@ -65,7 +78,10 @@ export function pickTopProduct(products: Product[], counts: Map<string, number>)
 
       return { product, salesCount };
     })
-    .filter((candidate): candidate is { product: Product; salesCount: number } => candidate !== null)
+    .filter(
+      (candidate): candidate is { product: Product; salesCount: number } =>
+        candidate !== null
+    )
     .sort((left, right) => {
       const salesDifference = right.salesCount - left.salesCount;
 
@@ -73,9 +89,13 @@ export function pickTopProduct(products: Product[], counts: Map<string, number>)
         return salesDifference;
       }
 
-      const nameDifference = left.product.name.localeCompare(right.product.name, "en-AU", {
-        sensitivity: "base",
-      });
+      const nameDifference = left.product.name.localeCompare(
+        right.product.name,
+        "en-AU",
+        {
+          sensitivity: "base",
+        }
+      );
 
       if (nameDifference !== 0) {
         return nameDifference;
@@ -88,7 +108,11 @@ export function pickTopProduct(products: Product[], counts: Map<string, number>)
   return candidates[0] ?? { product: null, salesCount: 0 };
 }
 
-function isDateInRange(date: string, startKey: number, endKey: number): boolean {
+function isDateInRange(
+  date: string,
+  startKey: number,
+  endKey: number
+): boolean {
   const dateKey = toDateKey(date);
 
   return dateKey >= startKey && dateKey <= endKey;
@@ -96,21 +120,25 @@ function isDateInRange(date: string, startKey: number, endKey: number): boolean 
 
 function resolveDateRange(
   fromDate?: string,
-  toDate?: string,
+  toDate?: string
 ): { startKey: number; endKey: number } | null {
   if (!fromDate && !toDate) {
     return null;
   }
 
   if (!fromDate) {
-    throw new Error("Invalid date range: fromDate is required when toDate is provided.");
+    throw new Error(
+      "Invalid date range: fromDate is required when toDate is provided."
+    );
   }
 
   const startKey = toDateKey(fromDate);
   const endKey = toDateKey(toDate ?? fromDate);
 
   if (startKey > endKey) {
-    throw new Error(`Invalid date range: from ${fromDate} must be before or equal to ${toDate}.`);
+    throw new Error(
+      `Invalid date range: from ${fromDate} must be before or equal to ${toDate}.`
+    );
   }
 
   return { startKey, endKey };

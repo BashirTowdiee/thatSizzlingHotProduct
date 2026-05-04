@@ -13,7 +13,10 @@ describe("GET /v1/sizzling-hot-products", () => {
 
   it("returns the default summary winner", async () => {
     app = await createServer();
-    const response = await app.inject({ method: "GET", url: "/v1/sizzling-hot-products" });
+    const response = await app.inject({
+      method: "GET",
+      url: "/v1/sizzling-hot-products",
+    });
     const body = response.json();
 
     expect(response.statusCode).toBe(200);
@@ -29,7 +32,7 @@ describe("GET /v1/sizzling-hot-products", () => {
           }),
           salesCount: 6,
         }),
-      }),
+      })
     );
   });
 });

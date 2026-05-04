@@ -43,9 +43,13 @@ const cancelledOrderSchema = z.object({
 });
 
 const productsSchema = z.array(productSchema);
-const ordersSchema = z.array(z.union([completedOrderSchema, cancelledOrderSchema]));
+const ordersSchema = z.array(
+  z.union([completedOrderSchema, cancelledOrderSchema])
+);
 
-export async function loadInputData(inputDirectory: string): Promise<InputData> {
+export async function loadInputData(
+  inputDirectory: string
+): Promise<InputData> {
   const [productsRaw, ordersRaw] = await Promise.all([
     readJsonArray(path.join(inputDirectory, "products.json")),
     readJsonArray(path.join(inputDirectory, "orders.json")),
@@ -55,7 +59,10 @@ export async function loadInputData(inputDirectory: string): Promise<InputData> 
   const orders = ordersSchema.parse(ordersRaw);
 
   ensureUniqueProductIds(products);
-  ensureKnownProductReferences(orders, new Set(products.map((product) => product.id)));
+  ensureKnownProductReferences(
+    orders,
+    new Set(products.map((product) => product.id))
+  );
 
   return { products, orders };
 }
@@ -76,14 +83,19 @@ function ensureUniqueProductIds(products: Product[]): void {
 
   for (const product of products) {
     if (seen.has(product.id)) {
-      throw new Error(`products.json contains duplicate product id ${product.id}.`);
+      throw new Error(
+        `products.json contains duplicate product id ${product.id}.`
+      );
     }
 
     seen.add(product.id);
   }
 }
 
-function ensureKnownProductReferences(orders: Order[], productIds: Set<string>): void {
+function ensureKnownProductReferences(
+  orders: Order[],
+  productIds: Set<string>
+): void {
   for (const order of orders) {
     if (!Array.isArray(order.entries)) {
       continue;
@@ -92,7 +104,7 @@ function ensureKnownProductReferences(orders: Order[], productIds: Set<string>):
     for (const entry of order.entries) {
       if (!productIds.has(entry.id)) {
         throw new Error(
-          `Order ${order.orderId} references unknown product ${entry.id}.`,
+          `Order ${order.orderId} references unknown product ${entry.id}.`
         );
       }
     }

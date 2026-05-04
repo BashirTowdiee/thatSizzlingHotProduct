@@ -10,7 +10,9 @@ const tempDirs: string[] = [];
 
 afterEach(async () => {
   await Promise.all(
-    tempDirs.splice(0).map((dirPath) => rm(dirPath, { recursive: true, force: true })),
+    tempDirs
+      .splice(0)
+      .map((dirPath) => rm(dirPath, { recursive: true, force: true }))
   );
 });
 
@@ -26,7 +28,7 @@ describe("loadInputData", () => {
       expect.objectContaining({
         id: expect.any(String),
         name: expect.any(String),
-      }),
+      })
     );
   });
 
@@ -41,10 +43,12 @@ describe("loadInputData", () => {
           date: "2026-04-21",
           status: "completed",
         },
-      ],
+      ]
     );
 
-    await expect(loadInputData(inputDirectory)).rejects.toThrow(validDateErrorSnippet);
+    await expect(loadInputData(inputDirectory)).rejects.toThrow(
+      validDateErrorSnippet
+    );
   });
 
   it("rejects unknown product references", async () => {
@@ -58,22 +62,35 @@ describe("loadInputData", () => {
           date: "21/04/2026",
           status: "completed",
         },
-      ],
+      ]
     );
 
     await expect(loadInputData(inputDirectory)).rejects.toThrow(
-      "Order O1 references unknown product P9.",
+      "Order O1 references unknown product P9."
     );
   });
 });
 
-async function createTempInputDirectory(products: unknown[], orders: unknown[]): Promise<string> {
-  const dirPath = await mkdtemp(path.join(os.tmpdir(), "that-sizzling-hot-product-"));
+async function createTempInputDirectory(
+  products: unknown[],
+  orders: unknown[]
+): Promise<string> {
+  const dirPath = await mkdtemp(
+    path.join(os.tmpdir(), "that-sizzling-hot-product-")
+  );
   tempDirs.push(dirPath);
 
   await Promise.all([
-    writeFile(path.join(dirPath, "products.json"), JSON.stringify(products), "utf8"),
-    writeFile(path.join(dirPath, "orders.json"), JSON.stringify(orders), "utf8"),
+    writeFile(
+      path.join(dirPath, "products.json"),
+      JSON.stringify(products),
+      "utf8"
+    ),
+    writeFile(
+      path.join(dirPath, "orders.json"),
+      JSON.stringify(orders),
+      "utf8"
+    ),
   ]);
 
   return dirPath;

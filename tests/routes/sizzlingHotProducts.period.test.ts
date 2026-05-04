@@ -29,7 +29,7 @@ describe("GET /v1/sizzling-hot-products/period", () => {
           name: "Ezy Storage 37L Flexi Laundry Basket - White",
         }),
         salesCount: 6,
-      }),
+      })
     );
   });
 
@@ -49,14 +49,14 @@ describe("GET /v1/sizzling-hot-products/period", () => {
     expect(missingQueryResponse.json()).toEqual(
       expect.objectContaining({
         error: "Bad Request",
-      }),
+      })
     );
 
     expect(invalidQueryResponse.statusCode).toBe(400);
     expect(invalidQueryResponse.json()).toEqual(
       expect.objectContaining({
         error: "Bad Request",
-      }),
+      })
     );
   });
 
@@ -72,7 +72,7 @@ describe("GET /v1/sizzling-hot-products/period", () => {
     expect(response.json()).toEqual(
       expect.objectContaining({
         error: "Bad Request",
-      }),
+      })
     );
   });
 });

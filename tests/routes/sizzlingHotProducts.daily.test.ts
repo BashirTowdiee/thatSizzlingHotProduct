@@ -28,7 +28,7 @@ describe("GET /v1/sizzling-hot-products/daily", () => {
           name: "Arlec 160W Crystalline Solar Foldable Charging Kit",
         }),
         salesCount: 1,
-      }),
+      })
     );
   });
 
@@ -48,14 +48,14 @@ describe("GET /v1/sizzling-hot-products/daily", () => {
     expect(missingDateResponse.json()).toEqual(
       expect.objectContaining({
         error: "Bad Request",
-      }),
+      })
     );
 
     expect(invalidDateResponse.statusCode).toBe(400);
     expect(invalidDateResponse.json()).toEqual(
       expect.objectContaining({
         error: "Bad Request",
-      }),
+      })
     );
   });
 });

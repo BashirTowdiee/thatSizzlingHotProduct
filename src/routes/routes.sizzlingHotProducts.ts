@@ -28,25 +28,19 @@ const badRequestResponseSchema = {
 } as const;
 
 const dailyDateQuerySchema = z.object({
-  date: z
-    .string()
-    .refine(isValidDate, {
-      message: 'Invalid query parameter "date". Expected DD/MM/YYYY.',
-    }),
+  date: z.string().refine(isValidDate, {
+    message: 'Invalid query parameter "date". Expected DD/MM/YYYY.',
+  }),
 });
 
 const periodDateQuerySchema = z
   .object({
-    from: z
-      .string()
-      .refine(isValidDate, {
-        message: 'Invalid query parameter "from". Expected DD/MM/YYYY.',
-      }),
-    to: z
-      .string()
-      .refine(isValidDate, {
-        message: 'Invalid query parameter "to". Expected DD/MM/YYYY.',
-      }),
+    from: z.string().refine(isValidDate, {
+      message: 'Invalid query parameter "from". Expected DD/MM/YYYY.',
+    }),
+    to: z.string().refine(isValidDate, {
+      message: 'Invalid query parameter "to". Expected DD/MM/YYYY.',
+    }),
   })
   .refine(({ from, to }) => toDateKey(from) <= toDateKey(to), {
     message: 'Invalid date range: "from" must be before or equal to "to".',

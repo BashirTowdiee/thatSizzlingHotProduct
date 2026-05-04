@@ -227,7 +227,11 @@ describe("calculateProductSalesCounts", () => {
       },
     ];
 
-    const counts = calculateProductSalesCounts(orders, "21/04/2026", "22/04/2026");
+    const counts = calculateProductSalesCounts(
+      orders,
+      "21/04/2026",
+      "22/04/2026"
+    );
 
     expect(counts.get("P1")).toBe(1);
     expect(counts.get("P2")).toBe(1);
@@ -246,7 +250,7 @@ describe("calculateProductSalesCounts", () => {
     ];
 
     expect(() => calculateProductSalesCounts(orders, "2026-04-21")).toThrow(
-      'Invalid date "2026-04-21". Expected DD/MM/YYYY.',
+      'Invalid date "2026-04-21". Expected DD/MM/YYYY.'
     );
   });
 
@@ -261,8 +265,10 @@ describe("calculateProductSalesCounts", () => {
       },
     ];
 
-    expect(() => calculateProductSalesCounts(orders, "23/04/2026", "21/04/2026")).toThrow(
-      "Invalid date range: from 23/04/2026 must be before or equal to 21/04/2026.",
+    expect(() =>
+      calculateProductSalesCounts(orders, "23/04/2026", "21/04/2026")
+    ).toThrow(
+      "Invalid date range: from 23/04/2026 must be before or equal to 21/04/2026."
     );
   });
 });
