@@ -1,6 +1,10 @@
 import type { Order, Product, ProductWinner } from "./types.js";
 
-export function calculateProductSalesCounts(orders: Order[]): Map<string, number> {
+export function calculateProductSalesCounts(
+  orders: Order[],
+  fromDate?: string,
+  toDate?: string,
+): Map<string, number> {
   const counts = new Map<string, number>();
   const countedSales = new Set<string>();
   const cancelledOrderIds = new Set(
@@ -14,6 +18,10 @@ export function calculateProductSalesCounts(orders: Order[]): Map<string, number
       typeof order.customerId !== "string" ||
       !Array.isArray(order.entries)
     ) {
+      continue;
+    }
+
+    if (!isDateInRange(order.date, fromDate, toDate)) {
       continue;
     }
 
@@ -34,8 +42,13 @@ export function calculateProductSalesCounts(orders: Order[]): Map<string, number
   return counts;
 }
 
-export function pickTopProductFromOrders(products: Product[], orders: Order[]): ProductWinner {
-  return pickTopProduct(products, calculateProductSalesCounts(orders));
+export function pickTopProductFromOrders(
+  products: Product[],
+  orders: Order[],
+  fromDate?: string,
+  toDate?: string,
+): ProductWinner {
+  return pickTopProduct(products, calculateProductSalesCounts(orders, fromDate, toDate));
 }
 
 export function pickTopProduct(products: Product[], counts: Map<string, number>): ProductWinner {
@@ -72,4 +85,23 @@ export function pickTopProduct(products: Product[], counts: Map<string, number>)
     });
 
   return candidates[0] ?? { product: null, salesCount: 0 };
+}
+
+function isDateInRange(date: string, fromDate?: string, toDate?: string): boolean {
+  if (!fromDate) {
+    return true;
+  }
+
+  const startDate = fromDate;
+  const endDate = toDate ?? fromDate;
+  const dateKey = toDateKey(date);
+  const startKey = toDateKey(startDate);
+  const endKey = toDateKey(endDate);
+
+  return dateKey >= startKey && dateKey <= endKey;
+}
+
+function toDateKey(date: string): number {
+  const [day, month, year] = date.split("/");
+  return Number(year) * 10000 + Number(month) * 100 + Number(day);
 }

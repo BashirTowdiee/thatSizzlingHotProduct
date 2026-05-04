@@ -177,6 +177,62 @@ describe("calculateProductSalesCounts", () => {
 
     expect(counts.get("P1")).toBe(1);
   });
+
+  it("filters sales to a single calendar date", () => {
+    const orders: Order[] = [
+      {
+        orderId: "O1",
+        customerId: "C1",
+        entries: [{ id: "P1", quantity: 1 }],
+        date: "21/04/2026",
+        status: "completed",
+      },
+      {
+        orderId: "O2",
+        customerId: "C2",
+        entries: [{ id: "P2", quantity: 1 }],
+        date: "22/04/2026",
+        status: "completed",
+      },
+    ];
+
+    const counts = calculateProductSalesCounts(orders, "22/04/2026");
+
+    expect(counts.get("P1")).toBeUndefined();
+    expect(counts.get("P2")).toBe(1);
+  });
+
+  it("filters sales to an inclusive calendar date range", () => {
+    const orders: Order[] = [
+      {
+        orderId: "O1",
+        customerId: "C1",
+        entries: [{ id: "P1", quantity: 1 }],
+        date: "21/04/2026",
+        status: "completed",
+      },
+      {
+        orderId: "O2",
+        customerId: "C2",
+        entries: [{ id: "P2", quantity: 1 }],
+        date: "22/04/2026",
+        status: "completed",
+      },
+      {
+        orderId: "O3",
+        customerId: "C3",
+        entries: [{ id: "P3", quantity: 1 }],
+        date: "23/04/2026",
+        status: "completed",
+      },
+    ];
+
+    const counts = calculateProductSalesCounts(orders, "21/04/2026", "22/04/2026");
+
+    expect(counts.get("P1")).toBe(1);
+    expect(counts.get("P2")).toBe(1);
+    expect(counts.get("P3")).toBeUndefined();
+  });
 });
 
 describe("pickTopProductFromOrders", () => {
