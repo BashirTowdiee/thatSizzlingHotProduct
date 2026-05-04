@@ -1,19 +1,50 @@
+import path from "node:path";
 import { FastifyInstance } from "fastify";
 import mercurius from "mercurius";
 
+import { loadInputData, type InputData } from "../data/inputData.js";
+import { pickTopProductFromOrders } from "../domain/sizzlingHotProducts.js";
+
 const schema = `
+  type Product {
+    id: ID!
+    name: String!
+  }
+
+  type DailySizzlingHotProductResult {
+    date: String!
+    product: Product
+    salesCount: Int!
+  }
+
   type Query {
     graphqlHealth: String!
+    sizzlingHotProduct(date: String!): DailySizzlingHotProductResult!
   }
 `;
 
-const resolvers = {
-  Query: {
-    graphqlHealth: async () => "ok",
-  },
-};
-
 export default async function graphqlRoutes(app: FastifyInstance) {
+  const inputDirectory = path.resolve(process.cwd(), "inputs");
+  let dataset: InputData | null = null;
+  const resolvers = {
+    Query: {
+      graphqlHealth: async () => "ok",
+      sizzlingHotProduct: async (_: unknown, args: { date: string }) => {
+        dataset ??= await loadInputData(inputDirectory);
+
+        return {
+          date: args.date,
+          ...pickTopProductFromOrders(
+            dataset.products,
+            dataset.orders,
+            args.date,
+            args.date
+          ),
+        };
+      },
+    },
+  };
+
   await app.register(mercurius, {
     schema,
     resolvers,

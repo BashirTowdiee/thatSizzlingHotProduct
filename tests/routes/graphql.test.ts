@@ -31,4 +31,60 @@ describe("POST /v1/graphql", () => {
       })
     );
   });
+
+  it('returns the daily sizzling hot product for date "23/04/2026"', async () => {
+    app = await createServer();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/graphql",
+      payload: {
+        query:
+          '{ sizzlingHotProduct(date: "23/04/2026") { date product { id name } salesCount } }',
+      },
+    });
+
+    const body = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(body.errors).toBeUndefined();
+    expect(body.data?.sizzlingHotProduct?.date).toBe("23/04/2026");
+    expect(body.data?.sizzlingHotProduct?.product).toEqual(
+      expect.objectContaining({
+        id: "P6",
+        name: "Arlec 160W Crystalline Solar Foldable Charging Kit",
+      })
+    );
+    expect(body.data?.sizzlingHotProduct?.salesCount).toEqual(
+      expect.any(Number)
+    );
+  });
+
+  it('returns the daily sizzling hot product for date "21/04/2026"', async () => {
+    app = await createServer();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/graphql",
+      payload: {
+        query:
+          '{ sizzlingHotProduct(date: "21/04/2026") { date product { id name } salesCount } }',
+      },
+    });
+
+    const body = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(body.errors).toBeUndefined();
+    expect(body.data?.sizzlingHotProduct?.date).toBe("21/04/2026");
+    expect(body.data?.sizzlingHotProduct?.product).toEqual(
+      expect.objectContaining({
+        id: "P1",
+        name: "Ezy Storage 37L Flexi Laundry Basket - White",
+      })
+    );
+    expect(body.data?.sizzlingHotProduct?.salesCount).toEqual(
+      expect.any(Number)
+    );
+  });
 });
