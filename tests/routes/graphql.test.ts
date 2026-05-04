@@ -11,27 +11,6 @@ describe("POST /v1/graphql", () => {
     app = undefined;
   });
 
-  it("returns graphql health query response", async () => {
-    app = await createServer();
-
-    const response = await app.inject({
-      method: "POST",
-      url: "/v1/graphql",
-      payload: {
-        query: "{ graphqlHealth }",
-      },
-    });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.json()).toEqual(
-      expect.objectContaining({
-        data: {
-          graphqlHealth: "ok",
-        },
-      })
-    );
-  });
-
   it('returns the daily sizzling hot product for date "23/04/2026"', async () => {
     app = await createServer();
 

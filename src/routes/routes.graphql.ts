@@ -25,7 +25,6 @@ const schema = `
   }
 
   type Query {
-    graphqlHealth: String!
     sizzlingHotProduct(date: String!): DailySizzlingHotProductResult!
     sizzlingHotProductForPeriod(from: String!, to: String!): PeriodSizzlingHotProductResult!
   }
@@ -36,7 +35,6 @@ export default async function graphqlRoutes(app: FastifyInstance) {
   let dataset: InputData | null = null;
   const resolvers = {
     Query: {
-      graphqlHealth: async () => "ok",
       sizzlingHotProduct: async (_: unknown, args: { date: string }) => {
         dataset ??= await loadInputData(inputDirectory);
 
