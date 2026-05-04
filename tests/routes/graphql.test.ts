@@ -34,9 +34,7 @@ describe("POST /v1/graphql", () => {
         name: "Arlec 160W Crystalline Solar Foldable Charging Kit",
       })
     );
-    expect(body.data?.sizzlingHotProduct?.salesCount).toEqual(
-      expect.any(Number)
-    );
+    expect(body.data?.sizzlingHotProduct?.salesCount).toBe(1);
   });
 
   it('returns the daily sizzling hot product for date "21/04/2026"', async () => {
@@ -62,9 +60,33 @@ describe("POST /v1/graphql", () => {
         name: "Ezy Storage 37L Flexi Laundry Basket - White",
       })
     );
-    expect(body.data?.sizzlingHotProduct?.salesCount).toEqual(
-      expect.any(Number)
+    expect(body.data?.sizzlingHotProduct?.salesCount).toBe(3);
+  });
+
+  it('returns the daily sizzling hot product for date "22/04/2026"', async () => {
+    app = await createServer();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/graphql",
+      payload: {
+        query:
+          '{ sizzlingHotProduct(date: "22/04/2026") { date product { id name } salesCount } }',
+      },
+    });
+
+    const body = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(body.errors).toBeUndefined();
+    expect(body.data?.sizzlingHotProduct?.date).toBe("22/04/2026");
+    expect(body.data?.sizzlingHotProduct?.product).toEqual(
+      expect.objectContaining({
+        id: "P1",
+        name: "Ezy Storage 37L Flexi Laundry Basket - White",
+      })
     );
+    expect(body.data?.sizzlingHotProduct?.salesCount).toBe(2);
   });
 
   it('returns GraphQL errors for invalid date "2026-04-23"', async () => {
@@ -114,9 +136,7 @@ describe("POST /v1/graphql", () => {
         name: "Ezy Storage 37L Flexi Laundry Basket - White",
       })
     );
-    expect(body.data?.sizzlingHotProductForPeriod?.salesCount).toEqual(
-      expect.any(Number)
-    );
+    expect(body.data?.sizzlingHotProductForPeriod?.salesCount).toBe(6);
   });
 
   it('returns GraphQL errors for invalid period range from "23/04/2026" to "21/04/2026"', async () => {

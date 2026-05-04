@@ -13,6 +13,7 @@ Implementation of the Bunnings challenge as a Fastify + TypeScript backend servi
 ## Stack and Rationale
 
 - `Fastify`: lightweight HTTP framework with good schema support and testability via `app.inject`.
+- `Mercurius`: minimal Fastify-native GraphQL integration for the optional read interface.
 - `TypeScript`: safer refactors and explicit contracts for domain entities.
 - `Zod`: runtime validation for external inputs (JSON files, route query params).
 - `Vitest`: fast unit/integration testing with minimal setup.
@@ -32,6 +33,7 @@ src/
     sizzlingHotProducts.ts
   routes/
     index.ts
+    routes.graphql.ts
     routes.health.ts
     routes.sizzlingHotProducts.ts
 tests/
