@@ -87,4 +87,27 @@ describe("POST /v1/graphql", () => {
       expect.any(Number)
     );
   });
+
+  it('returns GraphQL errors for invalid date "2026-04-23"', async () => {
+    app = await createServer();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/graphql",
+      payload: {
+        query:
+          '{ sizzlingHotProduct(date: "2026-04-23") { date product { id name } salesCount } }',
+      },
+    });
+
+    const body = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(body.errors).toEqual(expect.any(Array));
+    expect(body.errors.length).toBeGreaterThan(0);
+    expect(body.errors[0]?.message).toContain("Invalid date");
+
+    const dailyResult = body.data?.sizzlingHotProduct;
+    expect(dailyResult == null).toBe(true);
+  });
 });
