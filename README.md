@@ -17,6 +17,8 @@ Implementation of the Bunnings challenge as a Fastify + TypeScript backend servi
 - `Zod`: runtime validation for external inputs (JSON files, route query params).
 - `Vitest`: fast unit/integration testing with minimal setup.
 
+This submission focuses on the TypeScript API and business-logic layer because the challenge is centered on aggregation rules and product calculation; a React Native client can consume these endpoints directly, and the same domain layer can be exposed through GraphQL later if required.
+
 ## Project Structure
 
 ```text
