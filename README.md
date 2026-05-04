@@ -83,6 +83,15 @@ curl -i "http://localhost:3000/v1/sizzling-hot-products/daily?date=2026-04-23"
 curl -i "http://localhost:3000/v1/sizzling-hot-products/period?from=23/04/2026&to=21/04/2026"
 ```
 
+## Challenge Expected Outcomes
+
+| Date or Period             | Expected Product                                     | Endpoint                                                             |
+| -------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------- |
+| `21/04/2026`               | `Ezy Storage 37L Flexi Laundry Basket - White`       | `GET /v1/sizzling-hot-products/daily?date=21/04/2026`                |
+| `22/04/2026`               | `Ezy Storage 37L Flexi Laundry Basket - White`       | `GET /v1/sizzling-hot-products/daily?date=22/04/2026`                |
+| `23/04/2026`               | `Arlec 160W Crystalline Solar Foldable Charging Kit` | `GET /v1/sizzling-hot-products/daily?date=23/04/2026`                |
+| `21/04/2026 to 23/04/2026` | `Ezy Storage 37L Flexi Laundry Basket - White`       | `GET /v1/sizzling-hot-products/period?from=21/04/2026&to=23/04/2026` |
+
 ## API Endpoints
 
 All endpoints are under `/v1`.
@@ -219,7 +228,11 @@ Current suite includes:
 2. Add centralized error-mapping utility for consistent API error payloads.
 3. Add contract tests for exact error messages/payload schema.
 4. Allow configurable default summary range/today via environment variables.
-5. Add CI workflow running `format:check`, `build`, and `test`.
+
+## Implemented Nice-to-Have
+
+- CI workflow added at `.github/workflows/ci.yml` for push and pull requests.
+- CI pipeline runs: `npm ci`, `npm run format:check`, `npm run build`, and `npm test`.
 
 ## Reviewer Notes
 
