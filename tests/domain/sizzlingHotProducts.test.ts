@@ -233,6 +233,38 @@ describe("calculateProductSalesCounts", () => {
     expect(counts.get("P2")).toBe(1);
     expect(counts.get("P3")).toBeUndefined();
   });
+
+  it("throws for invalid date format in filter input", () => {
+    const orders: Order[] = [
+      {
+        orderId: "O1",
+        customerId: "C1",
+        entries: [{ id: "P1", quantity: 1 }],
+        date: "21/04/2026",
+        status: "completed",
+      },
+    ];
+
+    expect(() => calculateProductSalesCounts(orders, "2026-04-21")).toThrow(
+      'Invalid date "2026-04-21". Expected DD/MM/YYYY.',
+    );
+  });
+
+  it("throws for invalid date range when from is after to", () => {
+    const orders: Order[] = [
+      {
+        orderId: "O1",
+        customerId: "C1",
+        entries: [{ id: "P1", quantity: 1 }],
+        date: "21/04/2026",
+        status: "completed",
+      },
+    ];
+
+    expect(() => calculateProductSalesCounts(orders, "23/04/2026", "21/04/2026")).toThrow(
+      "Invalid date range: from 23/04/2026 must be before or equal to 21/04/2026.",
+    );
+  });
 });
 
 describe("pickTopProductFromOrders", () => {

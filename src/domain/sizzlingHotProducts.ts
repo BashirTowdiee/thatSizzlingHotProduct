@@ -7,6 +7,7 @@ export function calculateProductSalesCounts(
 ): Map<string, number> {
   const counts = new Map<string, number>();
   const countedSales = new Set<string>();
+  const dateRange = resolveDateRange(fromDate, toDate);
   const cancelledOrderIds = new Set(
     orders.filter((order) => order.status === "cancelled").map((order) => order.orderId),
   );
@@ -21,7 +22,7 @@ export function calculateProductSalesCounts(
       continue;
     }
 
-    if (!isDateInRange(order.date, fromDate, toDate)) {
+    if (dateRange && !isDateInRange(order.date, dateRange.startKey, dateRange.endKey)) {
       continue;
     }
 
@@ -87,21 +88,53 @@ export function pickTopProduct(products: Product[], counts: Map<string, number>)
   return candidates[0] ?? { product: null, salesCount: 0 };
 }
 
-function isDateInRange(date: string, fromDate?: string, toDate?: string): boolean {
-  if (!fromDate) {
-    return true;
-  }
-
-  const startDate = fromDate;
-  const endDate = toDate ?? fromDate;
+function isDateInRange(date: string, startKey: number, endKey: number): boolean {
   const dateKey = toDateKey(date);
-  const startKey = toDateKey(startDate);
-  const endKey = toDateKey(endDate);
 
   return dateKey >= startKey && dateKey <= endKey;
 }
 
+function resolveDateRange(
+  fromDate?: string,
+  toDate?: string,
+): { startKey: number; endKey: number } | null {
+  if (!fromDate && !toDate) {
+    return null;
+  }
+
+  if (!fromDate) {
+    throw new Error("Invalid date range: fromDate is required when toDate is provided.");
+  }
+
+  const startKey = toDateKey(fromDate);
+  const endKey = toDateKey(toDate ?? fromDate);
+
+  if (startKey > endKey) {
+    throw new Error(`Invalid date range: from ${fromDate} must be before or equal to ${toDate}.`);
+  }
+
+  return { startKey, endKey };
+}
+
 function toDateKey(date: string): number {
-  const [day, month, year] = date.split("/");
-  return Number(year) * 10000 + Number(month) * 100 + Number(day);
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(date);
+
+  if (!match) {
+    throw new Error(`Invalid date "${date}". Expected DD/MM/YYYY.`);
+  }
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+  const utcDate = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    utcDate.getUTCFullYear() !== year ||
+    utcDate.getUTCMonth() !== month - 1 ||
+    utcDate.getUTCDate() !== day
+  ) {
+    throw new Error(`Invalid date "${date}". Expected DD/MM/YYYY.`);
+  }
+
+  return year * 10000 + month * 100 + day;
 }
