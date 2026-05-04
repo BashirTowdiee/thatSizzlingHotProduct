@@ -1,4 +1,26 @@
-import type { Product, ProductWinner } from "./types.js";
+import type { Order, Product, ProductWinner } from "./types.js";
+
+export function calculateProductSalesCounts(orders: Order[]): Map<string, number> {
+  const counts = new Map<string, number>();
+
+  for (const order of orders) {
+    if (!Array.isArray(order.entries)) {
+      continue;
+    }
+
+    const uniqueProductIds = new Set(order.entries.map((entry) => entry.id));
+
+    for (const productId of uniqueProductIds) {
+      counts.set(productId, (counts.get(productId) ?? 0) + 1);
+    }
+  }
+
+  return counts;
+}
+
+export function pickTopProductFromOrders(products: Product[], orders: Order[]): ProductWinner {
+  return pickTopProduct(products, calculateProductSalesCounts(orders));
+}
 
 export function pickTopProduct(products: Product[], counts: Map<string, number>): ProductWinner {
   const productsById = new Map(products.map((product) => [product.id, product]));
