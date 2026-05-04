@@ -17,9 +17,17 @@ const schema = `
     salesCount: Int!
   }
 
+  type PeriodSizzlingHotProductResult {
+    from: String!
+    to: String!
+    product: Product
+    salesCount: Int!
+  }
+
   type Query {
     graphqlHealth: String!
     sizzlingHotProduct(date: String!): DailySizzlingHotProductResult!
+    sizzlingHotProductForPeriod(from: String!, to: String!): PeriodSizzlingHotProductResult!
   }
 `;
 
@@ -39,6 +47,23 @@ export default async function graphqlRoutes(app: FastifyInstance) {
             dataset.orders,
             args.date,
             args.date
+          ),
+        };
+      },
+      sizzlingHotProductForPeriod: async (
+        _: unknown,
+        args: { from: string; to: string }
+      ) => {
+        dataset ??= await loadInputData(inputDirectory);
+
+        return {
+          from: args.from,
+          to: args.to,
+          ...pickTopProductFromOrders(
+            dataset.products,
+            dataset.orders,
+            args.from,
+            args.to
           ),
         };
       },

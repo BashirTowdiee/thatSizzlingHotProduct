@@ -110,4 +110,56 @@ describe("POST /v1/graphql", () => {
     const dailyResult = body.data?.sizzlingHotProduct;
     expect(dailyResult == null).toBe(true);
   });
+
+  it('returns the period sizzling hot product for from "21/04/2026" to "23/04/2026"', async () => {
+    app = await createServer();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/graphql",
+      payload: {
+        query:
+          '{ sizzlingHotProductForPeriod(from: "21/04/2026", to: "23/04/2026") { from to product { id name } salesCount } }',
+      },
+    });
+
+    const body = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(body.errors).toBeUndefined();
+    expect(body.data?.sizzlingHotProductForPeriod?.from).toBe("21/04/2026");
+    expect(body.data?.sizzlingHotProductForPeriod?.to).toBe("23/04/2026");
+    expect(body.data?.sizzlingHotProductForPeriod?.product).toEqual(
+      expect.objectContaining({
+        id: "P1",
+        name: "Ezy Storage 37L Flexi Laundry Basket - White",
+      })
+    );
+    expect(body.data?.sizzlingHotProductForPeriod?.salesCount).toEqual(
+      expect.any(Number)
+    );
+  });
+
+  it('returns GraphQL errors for invalid period range from "23/04/2026" to "21/04/2026"', async () => {
+    app = await createServer();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/graphql",
+      payload: {
+        query:
+          '{ sizzlingHotProductForPeriod(from: "23/04/2026", to: "21/04/2026") { from to product { id name } salesCount } }',
+      },
+    });
+
+    const body = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(body.errors).toEqual(expect.any(Array));
+    expect(body.errors.length).toBeGreaterThan(0);
+    expect(body.errors[0]?.message).toContain("Invalid date range");
+
+    const periodResult = body.data?.sizzlingHotProductForPeriod;
+    expect(periodResult == null).toBe(true);
+  });
 });
