@@ -58,6 +58,31 @@ npm run build
 npm test
 ```
 
+## Manual Live Testing
+
+Start the server:
+
+```bash
+npm run dev
+```
+
+Happy-path checks:
+
+```bash
+curl http://localhost:3000/v1/health
+curl http://localhost:3000/v1/sizzling-hot-products
+curl "http://localhost:3000/v1/sizzling-hot-products/daily?date=23/04/2026"
+curl "http://localhost:3000/v1/sizzling-hot-products/period?from=21/04/2026&to=23/04/2026"
+```
+
+Error-path checks (should return HTTP 400):
+
+```bash
+curl -i "http://localhost:3000/v1/sizzling-hot-products/daily"
+curl -i "http://localhost:3000/v1/sizzling-hot-products/daily?date=2026-04-23"
+curl -i "http://localhost:3000/v1/sizzling-hot-products/period?from=23/04/2026&to=21/04/2026"
+```
+
 ## API Endpoints
 
 All endpoints are under `/v1`.
