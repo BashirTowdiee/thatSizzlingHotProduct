@@ -177,6 +177,30 @@ Error on missing/invalid/from>to:
 }
 ```
 
+## Optional GraphQL Interface
+
+The REST API remains the primary challenge interface. This branch also includes a minimal optional GraphQL endpoint to demonstrate that the same framework-independent domain layer can be exposed through another transport without duplicating business logic.
+
+Endpoint:
+
+`POST /v1/graphql`
+
+Daily query example:
+
+```bash
+curl -X POST http://localhost:3000/v1/graphql \
+  -H "content-type: application/json" \
+  -d '{"query":"query { sizzlingHotProduct(date: \"23/04/2026\") { date product { id name } salesCount } }"}'
+```
+
+Period query example:
+
+```bash
+curl -X POST http://localhost:3000/v1/graphql \
+  -H "content-type: application/json" \
+  -d '{"query":"query { sizzlingHotProductForPeriod(from: \"21/04/2026\", to: \"23/04/2026\") { from to product { id name } salesCount } }"}'
+```
+
 ## Business Rules Coverage
 
 Implemented in `src/domain/sizzlingHotProducts.ts`:
