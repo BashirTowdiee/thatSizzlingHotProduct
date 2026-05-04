@@ -90,6 +90,36 @@ describe("calculateProductSalesCounts", () => {
     expect(counts.get("P1")).toBe(2);
     expect(counts.get("P2")).toBe(1);
   });
+
+  it("excludes same-customer same-product purchases on the same day across completed orders", () => {
+    const orders: Order[] = [
+      {
+        orderId: "O1",
+        customerId: "C1",
+        entries: [{ id: "P1", quantity: 1 }],
+        date: "21/04/2026",
+        status: "completed",
+      },
+      {
+        orderId: "O2",
+        customerId: "C1",
+        entries: [{ id: "P1", quantity: 9 }],
+        date: "21/04/2026",
+        status: "completed",
+      },
+      {
+        orderId: "O3",
+        customerId: "C1",
+        entries: [{ id: "P1", quantity: 2 }],
+        date: "22/04/2026",
+        status: "completed",
+      },
+    ];
+
+    const counts = calculateProductSalesCounts(orders);
+
+    expect(counts.get("P1")).toBe(2);
+  });
 });
 
 describe("pickTopProductFromOrders", () => {

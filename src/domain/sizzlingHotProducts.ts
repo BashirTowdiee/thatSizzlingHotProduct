@@ -2,15 +2,27 @@ import type { Order, Product, ProductWinner } from "./types.js";
 
 export function calculateProductSalesCounts(orders: Order[]): Map<string, number> {
   const counts = new Map<string, number>();
+  const countedSales = new Set<string>();
 
   for (const order of orders) {
-    if (!Array.isArray(order.entries)) {
+    if (
+      order.status !== "completed" ||
+      typeof order.customerId !== "string" ||
+      !Array.isArray(order.entries)
+    ) {
       continue;
     }
 
     const uniqueProductIds = new Set(order.entries.map((entry) => entry.id));
 
     for (const productId of uniqueProductIds) {
+      const saleKey = `${order.date}|${order.customerId}|${productId}`;
+
+      if (countedSales.has(saleKey)) {
+        continue;
+      }
+
+      countedSales.add(saleKey);
       counts.set(productId, (counts.get(productId) ?? 0) + 1);
     }
   }
