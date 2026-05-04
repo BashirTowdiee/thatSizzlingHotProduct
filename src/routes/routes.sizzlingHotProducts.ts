@@ -18,11 +18,40 @@ const productSchema = {
   },
 } as const;
 
+const badRequestResponseSchema = {
+  type: "object",
+  required: ["error", "message"],
+  properties: {
+    error: { type: "string" },
+    message: { type: "string" },
+  },
+} as const;
+
 const dailyDateQuerySchema = z.object({
   date: z
     .string()
-    .refine(isValidDate, { message: 'Invalid query parameter "date". Expected DD/MM/YYYY.' }),
+    .refine(isValidDate, {
+      message: 'Invalid query parameter "date". Expected DD/MM/YYYY.',
+    }),
 });
+
+const periodDateQuerySchema = z
+  .object({
+    from: z
+      .string()
+      .refine(isValidDate, {
+        message: 'Invalid query parameter "from". Expected DD/MM/YYYY.',
+      }),
+    to: z
+      .string()
+      .refine(isValidDate, {
+        message: 'Invalid query parameter "to". Expected DD/MM/YYYY.',
+      }),
+  })
+  .refine(({ from, to }) => toDateKey(from) <= toDateKey(to), {
+    message: 'Invalid date range: "from" must be before or equal to "to".',
+    path: ["from"],
+  });
 
 export default async function sizzlingHotProductsRoutes(app: FastifyInstance) {
   const inputDirectory = path.resolve(process.cwd(), "inputs");
@@ -63,10 +92,15 @@ export default async function sizzlingHotProductsRoutes(app: FastifyInstance) {
         period: {
           from: DEFAULT_FROM,
           to: DEFAULT_TO,
-          ...pickTopProductFromOrders(dataset.products, dataset.orders, DEFAULT_FROM, DEFAULT_TO),
+          ...pickTopProductFromOrders(
+            dataset.products,
+            dataset.orders,
+            DEFAULT_FROM,
+            DEFAULT_TO
+          ),
         },
       };
-    },
+    }
   );
 
   app.get(
@@ -85,6 +119,7 @@ export default async function sizzlingHotProductsRoutes(app: FastifyInstance) {
               salesCount: { type: "number" },
             },
           },
+          400: badRequestResponseSchema,
         },
       },
     },
@@ -106,10 +141,57 @@ export default async function sizzlingHotProductsRoutes(app: FastifyInstance) {
           dataset.products,
           dataset.orders,
           parsed.data.date,
-          parsed.data.date,
+          parsed.data.date
         ),
       };
+    }
+  );
+
+  app.get(
+    "/sizzling-hot-products/period",
+    {
+      schema: {
+        response: {
+          200: {
+            type: "object",
+            required: ["from", "to", "product", "salesCount"],
+            properties: {
+              from: { type: "string" },
+              to: { type: "string" },
+              product: {
+                anyOf: [productSchema, { type: "null" }],
+              },
+              salesCount: { type: "number" },
+            },
+          },
+          400: badRequestResponseSchema,
+        },
+      },
     },
+    async (request, reply) => {
+      const parsed = periodDateQuerySchema.safeParse(request.query);
+
+      if (!parsed.success) {
+        return reply.status(400).send({
+          error: "Bad Request",
+          message:
+            'Invalid query parameters "from" and "to". Expected DD/MM/YYYY with from before or equal to to.',
+        });
+      }
+
+      dataset ??= await loadInputData(inputDirectory);
+
+      return {
+        from: parsed.data.from,
+        to: parsed.data.to,
+        ...pickTopProductFromOrders(
+          dataset.products,
+          dataset.orders,
+          parsed.data.from,
+          parsed.data.to
+        ),
+      };
+    }
   );
 }
 
@@ -130,4 +212,9 @@ function isValidDate(value: string): boolean {
     utcDate.getUTCMonth() === month - 1 &&
     utcDate.getUTCDate() === day
   );
+}
+
+function toDateKey(date: string): number {
+  const [day, month, year] = date.split("/");
+  return Number(year) * 10000 + Number(month) * 100 + Number(day);
 }
